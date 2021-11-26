@@ -11,14 +11,35 @@
 // })
 
 const express = require('express')
+const morgan = require('morgan')
 const app = express()
 
-app.use(express.json())
+// function logger(req, res, next) {
+    // console.log(`Route received: ${req.protocol}://${req.get('host')}${req.originalUrl}`)
+    // next()
+// }
 
-app.all('/user', (req, res, next) => {
-    console.log('Por aqui paso')
+// app.use(logger)
+
+//Settings
+app.set('appName', 'Fazt Express Tutorial')
+app.set('port', 3000)
+app.set('view engine', 'ejs')
+
+//Middlewares
+app.use(express.json())
+app.use(morgan('dev'))
+
+//Routes
+// app.all('/user', (req, res, next) => {
+    // console.log('Por aqui paso')
     // res.send('finish')
-    next()
+    // next()
+// })
+
+app.get('/', (req, res) => {
+    const data = [{name: 'john'}, {name: 'joe'}, {name: 'cameron'}]
+    res.render('index.ejs', {people: data})
 })
 
 app.get('/user', (req, res) => {
@@ -26,6 +47,10 @@ app.get('/user', (req, res) => {
         username: 'Cameron',
         lastname: 'Howe'
     })
+})
+
+app.get('/user/about', (req, res) => {
+    res.send('<h1>Acerca del autor</h1>')
 })
 
 app.post('/user/:idDeUsuario', (req, res) => {
@@ -46,6 +71,9 @@ app.delete('/user/:userId', (req, res) => {
     res.send(`User ${req.params.userId} deleted`)
 })
 
-app.listen(5000, () => {
-    console.log('Server on port 5000')
+app.use(express.static('./public'))
+
+app.listen(app.get('port'), () => {
+    console.log(app.get('appName'))
+    console.log('Server on port', app.get('port'))
 })
